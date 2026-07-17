@@ -1,0 +1,30 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+ml_env/
+ML_ENV/
+ML_ENV*/
+
+# Local environment variables
+.env
+.flaskenv
+
+# IDE configurations
+.vscode/
+.idea/
+
+# OS specific files
+.DS_Store
+Thumbs.db

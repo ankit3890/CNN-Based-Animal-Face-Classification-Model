@@ -1,0 +1,481 @@
+/* CSS Variable Definition - Minimalist, Professional Black and Gray Theme */
+:root {
+    --bg-primary: #0a0a0a;        /* Pitch black background */
+    --bg-card: #171717;           /* Dark gray card background */
+    --bg-input: #0a0a0a;          /* Pitch black input background */
+    
+    --border-color: #262626;      /* Solid dark gray border */
+    --border-hover: #404040;      /* Lighter solid gray border for hover states */
+    
+    --text-primary: #ffffff;      /* Pure white main text */
+    --text-secondary: #a3a3a3;    /* Medium gray descriptive text */
+    --text-muted: #737373;         /* Muted dark gray text */
+    
+    --accent-color: #525252;      /* Neutral charcoal gray accent */
+    --accent-hover: #404040;      /* Darker neutral gray on hover */
+    
+    --success-color: #d4d4d4;     /* Light gray for accuracy highlights */
+    --error-bg: #2d1515;          /* Muted dark red error container */
+    --error-border: #7f1d1d;      /* Solid dark red error border */
+    --error-text: #fca5a5;        /* Light pink/red error text */
+    
+    --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --transition: all 0.2s ease-in-out;
+}
+
+/* Reset and Core Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-stack);
+    line-height: 1.5;
+    padding-bottom: 2rem;
+}
+
+/* Header Component */
+.app-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 2.5rem 1rem;
+    text-align: center;
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-bottom: 0.5rem;
+}
+
+.header-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Main Layout Grid */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* Metrics Row */
+.metrics-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+}
+
+.metric-label {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Workspace Grid Layout */
+.workspace-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .workspace-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card Styling */
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.card-desc {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Drag & Drop Area */
+.upload-zone {
+    align-items: center;
+    background-color: var(--bg-primary);
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 250px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    transition: var(--transition);
+}
+
+.upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--border-hover);
+    background-color: rgba(30, 41, 59, 0.5);
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+.upload-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.upload-icon-text {
+    background-color: var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 1rem;
+    transition: var(--transition);
+}
+
+.upload-zone:hover .upload-icon-text {
+    background-color: var(--border-hover);
+}
+
+.upload-subtext {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Preview Image */
+.preview-img {
+    border-radius: 6px;
+    max-height: 220px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Buttons */
+.btn-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn {
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-stack);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    text-align: center;
+    transition: var(--transition);
+    user-select: none;
+    width: 100%;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    border: none;
+    color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+}
+
+.btn-primary:disabled {
+    background-color: var(--border-color);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-color);
+}
+
+/* Result Blocks styling */
+.result-block {
+    margin-top: 2rem;
+}
+
+.result-divider {
+    border-top: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.result-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+}
+
+.predicted-class-container {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.predicted-class-label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.predicted-class-value {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.probabilities-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.prob-header {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.prob-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.prob-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+}
+
+.prob-label {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.prob-val-text {
+    color: var(--text-secondary);
+}
+
+.prob-bar-bg {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    height: 10px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.prob-bar-fill {
+    background-color: var(--accent-color);
+    height: 100%;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+}
+
+/* Error alert box */
+.error-alert {
+    background-color: var(--error-bg);
+    border: 1px solid var(--error-border);
+    border-radius: 6px;
+    color: var(--error-text);
+    font-size: 0.875rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
+}
+
+/* Model Spec and Architecture sections */
+.spec-section {
+    border-top: 1px solid var(--border-color);
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+}
+
+.spec-header {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.spec-list {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    list-style-type: none;
+}
+
+.spec-list li {
+    margin-bottom: 0.5rem;
+}
+
+.spec-list li strong {
+    color: var(--text-primary);
+}
+
+/* Architecture Flow Diagram */
+.architecture-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.arch-layer {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1rem;
+}
+
+.layer-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.layer-dims {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+.final-layer {
+    border-color: var(--accent-color);
+}
+
+.final-layer .layer-name {
+    color: var(--accent-color);
+}
+
+.arch-flow-arrow {
+    color: var(--text-muted);
+    font-size: 1rem;
+    text-align: center;
+    user-select: none;
+}
+
+/* Demo Images Section */
+.demo-section {
+    margin-top: 1.5rem;
+}
+
+.demo-header {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+.demo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.demo-card {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem;
+    transition: var(--transition);
+}
+
+.demo-card:hover {
+    border-color: var(--border-hover);
+    background-color: rgba(30, 41, 59, 0.3);
+}
+
+.demo-card img {
+    border-radius: 4px;
+    height: 60px;
+    width: 60px;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+}
+
+.demo-name {
+    color: var(--text-primary);
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Footer Section */
+.app-footer {
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    margin-top: 4rem;
+    padding: 2rem 1rem;
+    text-align: center;
+}

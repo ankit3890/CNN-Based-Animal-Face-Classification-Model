@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Face Classification Dashboard</title>
+    <!-- Google Fonts for professional typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-container">
+            <h1 class="header-title">Animal Face Classification</h1>
+            <p class="header-subtitle">Real-time image classification of animal faces using a custom Convolutional Neural Network.</p>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <!-- Top Metrics Row -->
+        <section class="metrics-row">
+            <div class="metric-card">
+                <span class="metric-label">Model Test Accuracy</span>
+                <span class="metric-value">97.56%</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Evaluation Loss</span>
+                <span class="metric-value">0.011</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Target Classes</span>
+                <span class="metric-value">Cat, Dog, Wild</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Train Epochs</span>
+                <span class="metric-value">10</span>
+            </div>
+        </section>
+
+        <!-- Main Workspace Grid -->
+        <div class="workspace-grid">
+            <!-- Left Column: Image Upload & Inference -->
+            <section class="card workspace-left">
+                <h2 class="card-title">Classification Dashboard</h2>
+                <p class="card-desc">Upload a clear face image of a cat, dog, or wild animal to analyze.</p>
+
+                <!-- Drag and Drop Area -->
+                <div class="upload-zone" id="drop-zone">
+                    <input type="file" id="file-input" accept="image/*" class="file-input-hidden">
+                    <div class="upload-prompt" id="upload-prompt">
+                        <span class="upload-icon-text">Select Image File</span>
+                        <p class="upload-subtext">Drag and drop image here or click to browse</p>
+                    </div>
+                    <img id="image-preview" class="preview-img hidden" alt="Uploaded Preview">
+                </div>
+
+                <!-- Try with Demo Images -->
+                <div class="demo-section">
+                    <h4 class="demo-header">Try with Demo Images</h4>
+                    <div class="demo-grid">
+                        <div class="demo-card" data-file="/static/Cat.png" data-name="Cat.png">
+                            <img src="/static/Cat.png" alt="Cat Demo">
+                            <span class="demo-name">Cat</span>
+                        </div>
+                        <div class="demo-card" data-file="/static/Dog.png" data-name="Dog.png">
+                            <img src="/static/Dog.png" alt="Dog Demo">
+                            <span class="demo-name">Dog</span>
+                        </div>
+                        <div class="demo-card" data-file="/static/fox.png" data-name="fox.png">
+                            <img src="/static/fox.png" alt="Fox Demo">
+                            <span class="demo-name">Fox</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="classify-btn" disabled>Classify Image</button>
+                    <button class="btn btn-secondary hidden" id="reset-btn">Reset</button>
+                </div>
+
+                <!-- Prediction Output Block -->
+                <div class="result-block hidden" id="result-block">
+                    <div class="result-divider"></div>
+                    <h3 class="result-header">Analysis Results</h3>
+                    
+                    <div class="predicted-class-container">
+                        <span class="predicted-class-label">Predicted Class</span>
+                        <span class="predicted-class-value" id="prediction-value">Cat</span>
+                    </div>
+
+                    <div class="probabilities-container">
+                        <h4 class="prob-header">Class Probabilities</h4>
+                        
+                        <!-- Cat Probability -->
+                        <div class="prob-row">
+                            <div class="prob-label-row">
+                                <span class="prob-label">Cat</span>
+                                <span class="prob-val-text" id="prob-val-cat">0.0%</span>
+                            </div>
+                            <div class="prob-bar-bg">
+                                <div class="prob-bar-fill" id="prob-bar-cat" style="width: 0%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Dog Probability -->
+                        <div class="prob-row">
+                            <div class="prob-label-row">
+                                <span class="prob-label">Dog</span>
+                                <span class="prob-val-text" id="prob-val-dog">0.0%</span>
+                            </div>
+                            <div class="prob-bar-bg">
+                                <div class="prob-bar-fill" id="prob-bar-dog" style="width: 0%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Wild Animal Probability -->
+                        <div class="prob-row">
+                            <div class="prob-label-row">
+                                <span class="prob-label">Wild Animal</span>
+                                <span class="prob-val-text" id="prob-val-wild">0.0%</span>
+                            </div>
+                            <div class="prob-bar-bg">
+                                <div class="prob-bar-fill" id="prob-bar-wild" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Alert Box -->
+                <div class="error-alert hidden" id="error-alert"></div>
+            </section>
+
+            <!-- Right Column: Model Card & Architecture -->
+            <section class="card workspace-right">
+                <h2 class="card-title">Model Specifications</h2>
+                <p class="card-desc">Details of the underlying PyTorch Convolutional Neural Network (CNN).</p>
+
+                <div class="spec-section">
+                    <h3 class="spec-header">Hyperparameters</h3>
+                    <ul class="spec-list">
+                        <li><strong>Optimizer:</strong> Adam</li>
+                        <li><strong>Learning Rate:</strong> 1e-4 (0.0001)</li>
+                        <li><strong>Batch Size:</strong> 16</li>
+                        <li><strong>Loss Function:</strong> CrossEntropyLoss</li>
+                        <li><strong>Training Device:</strong> CUDA (NVIDIA GPU)</li>
+                    </ul>
+                </div>
+
+                <div class="spec-section">
+                    <h3 class="spec-header">Network Architecture</h3>
+                    <div class="architecture-diagram">
+                        <div class="arch-layer">
+                            <span class="layer-name">Input Tensor</span>
+                            <span class="layer-dims">(3 Channels, 128x128 pixels)</span>
+                        </div>
+                        <div class="arch-flow-arrow">↓</div>
+                        <div class="arch-layer">
+                            <span class="layer-name">Convolution Block 1</span>
+                            <span class="layer-dims">Conv2d (3 ➔ 32) | MaxPool2d (2x2) | ReLU</span>
+                        </div>
+                        <div class="arch-flow-arrow">↓</div>
+                        <div class="arch-layer">
+                            <span class="layer-name">Convolution Block 2</span>
+                            <span class="layer-dims">Conv2d (32 ➔ 64) | MaxPool2d (2x2) | ReLU</span>
+                        </div>
+                        <div class="arch-flow-arrow">↓</div>
+                        <div class="arch-layer">
+                            <span class="layer-name">Convolution Block 3</span>
+                            <span class="layer-dims">Conv2d (64 ➔ 128) | MaxPool2d (2x2) | ReLU</span>
+                        </div>
+                        <div class="arch-flow-arrow">↓</div>
+                        <div class="arch-layer">
+                            <span class="layer-name">Flatten</span>
+                            <span class="layer-dims">128 * 16 * 16 = 32,768 units</span>
+                        </div>
+                        <div class="arch-flow-arrow">↓</div>
+                        <div class="arch-layer">
+                            <span class="layer-name">Fully Connected Layer</span>
+                            <span class="layer-dims">Linear (32,768 ➔ 128) | ReLU</span>
+                        </div>
+                        <div class="arch-flow-arrow">↓</div>
+                        <div class="arch-layer final-layer">
+                            <span class="layer-name">Output Classifier</span>
+                            <span class="layer-dims">Linear (128 ➔ 3 Logits)</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>Built with PyTorch, FastAPI, and Vanilla JavaScript. Dataset: AFHQ (Animal Faces High Quality).</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
