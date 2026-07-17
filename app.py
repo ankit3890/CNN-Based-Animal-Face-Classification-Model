@@ -1,80 +1,49 @@
 import io
 import os
-import torch
-import torch.nn as nn
+import numpy as np
+import onnxruntime as ort
 from PIL import Image
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from torchvision import transforms
 
-# 1. Define Model Architecture
-class Net(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
-        self.pooling = nn.MaxPool2d(2, 2)
-        self.relu = nn.ReLU()
-        self.flatten = nn.Flatten()
-        self.linear = nn.Linear((128 * 16 * 16), 128)
-        self.output = nn.Linear(128, 3)  # Three classes: Cat, Dog, Wild
-
-    def forward(self, x):
-        x = self.conv1(x)
-        x = self.pooling(x)
-        x = self.relu(x)
-
-        x = self.conv2(x)
-        x = self.pooling(x)
-        x = self.relu(x)
-
-        x = self.conv3(x)
-        x = self.pooling(x)
-        x = self.relu(x)
-
-        x = self.flatten(x)
-        x = self.linear(x)
-        x = self.output(x)
-        return x
-
-# Initialize Device
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# Load Trained Weights
-model_path = os.path.join(os.path.dirname(__file__), "model.pth")
+# Initialize ONNX Runtime Session
+model_path = os.path.join(os.path.dirname(__file__), "model.onnx")
 if not os.path.exists(model_path):
-    raise RuntimeError(f"Trained model state dict not found at {model_path}!")
+    raise RuntimeError(f"Trained ONNX model not found at {model_path}!")
 
-model = Net().to(device)
-try:
-    model.load_state_dict(torch.load(model_path, map_location=device))
-except Exception as e:
-    # In case the file is a full serialized model instead of a state_dict
-    try:
-        model = torch.load(model_path, map_location=device)
-    except Exception as e2:
-        raise RuntimeError(f"Failed to load model weights: {e}\n{e2}")
-
-model.eval()
-
-# 2. Define Image Transformations
-# These exact transforms were used in the training pipeline
-transform = transforms.Compose([
-    transforms.Resize((128, 128)),
-    transforms.ToTensor(),
-    transforms.Normalize(
-        mean=[0.485, 0.456, 0.406],
-        std=[0.229, 0.224, 0.225]
-    )
-])
+# Load the session (automatically detects model.onnx.data in the same folder)
+session = ort.InferenceSession(model_path)
+input_name = session.get_inputs()[0].name
 
 # Label Encoder indices mapping: alphabetical sorted classes
-# Index 0: cat, Index 1: dog, Index 2: wild
+# Index 0: Cat, Index 1: Dog, Index 2: Wild Animal
 class_names = ["Cat", "Dog", "Wild Animal"]
 
-# 3. Create FastAPI App
+# Helper function to preprocess images using pure numpy & PIL (no PyTorch/torchvision dependencies)
+def preprocess_image(image: Image.Image) -> np.ndarray:
+    # 1. Resize (Bilinear interpolation matches torchvision default)
+    image = image.resize((128, 128), Image.Resampling.BILINEAR)
+    
+    # 2. ToTensor (convert to float32, scale to [0, 1], transpose HWC to CHW)
+    img_arr = np.array(image).astype(np.float32) / 255.0
+    img_arr = img_arr.transpose(2, 0, 1)
+    
+    # 3. Normalize (ImageNet stats)
+    mean = np.array([0.485, 0.456, 0.406], dtype=np.float32).reshape(3, 1, 1)
+    std = np.array([0.229, 0.224, 0.225], dtype=np.float32).reshape(3, 1, 1)
+    img_arr = (img_arr - mean) / std
+    
+    # 4. Add batch dimension (1, 3, 128, 128)
+    img_arr = np.expand_dims(img_arr, axis=0)
+    return img_arr
+
+# Helper function to compute softmax
+def softmax(x):
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum(axis=0)
+
+# Create FastAPI App
 app = FastAPI(title="Animal Face Classifier API")
 
 # Ensure static files directory exists
@@ -101,15 +70,16 @@ async def predict(file: UploadFile = File(...)):
         image_bytes = await file.read()
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         
-        # Apply preprocess transformations
-        input_tensor = transform(image).to(device)
-        input_tensor = input_tensor.unsqueeze(0)  # Add batch dimension (1, 3, 128, 128)
+        # Preprocess
+        input_data = preprocess_image(image)
         
-        # Inference
-        with torch.no_grad():
-            outputs = model(input_tensor)
-            probabilities = torch.softmax(outputs, dim=1).squeeze().tolist()
-            predicted_idx = torch.argmax(outputs, dim=1).item()
+        # Inference using ONNX Runtime
+        outputs = session.run(None, {input_name: input_data})
+        logits = outputs[0][0]  # Shape: (3,)
+        
+        # Calculate probabilities using Softmax
+        probabilities = softmax(logits).tolist()
+        predicted_idx = int(np.argmax(logits))
         
         # Format response
         res = {
