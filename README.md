@@ -2,6 +2,8 @@
 
 This repository contains a PyTorch deep learning project and an accompanying FastAPI web application designed to classify animal faces into three distinct categories: Cat, Dog, and Wild Animal.
 
+Live Demo: https://cnn-based-animal-face-classificatio.vercel.app/
+
 ---
 
 ## Application Workflow Diagram
